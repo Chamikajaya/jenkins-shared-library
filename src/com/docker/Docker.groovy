@@ -15,25 +15,35 @@ class Docker implements Serializable {
 
         script.echo "Building docker image"
 
+        // Execute a shell command to build a Docker image
+        script.sh "docker build -t $imageName ."
+
+    }
+
+    def dockerHubLogin() {
+
+        script.echo "Logging in to Docker Hub"
+
         script.withCredentials([script.usernamePassword(
                 credentialsId: 'docker-hub-credentials',
                 passwordVariable: 'DOCKER_HUB_PASSWORD',
                 usernameVariable: 'DOCKER_HUB_USERNAME')]) {
-
-            // Execute a shell command to build a Docker image
-            script.sh "docker build -t $imageName ."
 
             // Execute a shell command to log in to Docker Hub
             // The `echo $DOCKER_HUB_PASSWORD` part is used to pass the password to the `docker login` command
             // The `--password-stdin` option tells Docker to read the password from the standard input
             script.sh "echo '${script.DOCKER_HUB_PASSWORD}' | docker login -u '${script.DOCKER_HUB_USERNAME}' --password-stdin"
 
-            // Execute a shell command to push the Docker image to Docker Hub
-            script.sh "docker push $imageName"
-        }
 
+        }
     }
 
-    // * we cam add more Docker related methods here ...
+    def dockerHubPush(String imageName) {
+
+        script.echo "Pushing docker image to Docker Hub"
+
+        // Execute a shell command to push the Docker image to Docker Hub
+        script.sh "docker push $imageName"
+    }
 
 }
