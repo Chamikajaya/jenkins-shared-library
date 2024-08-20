@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def call() {
+def call(String imageName) {
     echo "Building docker image"
 
     withCredentials([usernamePassword(
@@ -9,11 +9,9 @@ def call() {
             // The variable that will hold the password from the credentials
             passwordVariable: 'DOCKER_HUB_PASSWORD',
             // The variable that will hold the username from the credentials
-            usernameVariable: 'DOCKER_HUB_USERNAME'
-    )]) {
+            usernameVariable: 'DOCKER_HUB_USERNAME')]) {
         // Execute a shell command to build a Docker image
-        // TODO: Later increment the tag dynamically -->
-        sh "docker build -t chamikajay/jenkins-simple-app:1.0.1 ."
+        sh "docker build -t $imageName ."
 
         // Execute a shell command to log in to Docker Hub
         // The `echo $DOCKER_HUB_PASSWORD` part is used to pass the password to the `docker login` command
@@ -22,7 +20,7 @@ def call() {
         sh "echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin"
 
         // Execute a shell command to push the Docker image to Docker Hub
-        sh "docker push chamikajay/jenkins-simple-app:1.0.0"
+        sh "docker push $imageName"
     }
 
 }
